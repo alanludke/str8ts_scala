@@ -1,13 +1,24 @@
 import scala.io.Source
 
 object Sudoku {
-  val puzzle: Array[Array[Int]] = Array.ofDim[Int](9, 9)
+  var size = 8
+  val puzzle: Array[Array[Int]] = Array.ofDim[Int](size, size)
 
   def main(args: Array[String]): Unit = {
-    parsePuzzle(readFile("input/board_9.txt"))
-    display()
+    val source = readFile("input/board_"+size)
+    parsePuzzle(source)
     solve(0, 0)
     display()
+  }
+
+  def display(): Unit = {
+    for (i <- 0 until size) {
+      for (j <- 0 until size) {
+        print(puzzle(i)(j) + " ")
+      }
+      println()
+    }
+    println()
   }
 
   def readFile(filename: String): Array[String] = {
@@ -29,37 +40,17 @@ object Sudoku {
   }
 
   def validate(row: Int, col: Int, num: Int): Boolean = {
-    for (i <- 0 until 9) {
+    for (i <- 0 until size) {
       if (puzzle(row)(i) == num || puzzle(i)(col) == num) {
         return false
-      }
-    }
-
-    val r = (row / 3) * 3
-    val c = (col / 3) * 3
-    for (i <- r until r + 3) {
-      for (j <- c until c + 3) {
-        if (puzzle(i)(j) == num) {
-          return false
-        }
       }
     }
     true
   }
 
-  def display(): Unit = {
-    for (i <- 0 until 9) {
-      for (j <- 0 until 9) {
-        print(puzzle(i)(j) + " ")
-      }
-      println()
-    }
-    println()
-  }
-
   def puzzleSolved(): Boolean = {
-    for (i <- 0 until 9) {
-      for (j <- 0 until 9) {
+    for (i <- 0 until size) {
+      for (j <- 0 until size) {
         if (puzzle(i)(j) == 0) {
           return false
         }
@@ -69,7 +60,7 @@ object Sudoku {
   }
 
   def next(row: Int, col: Int): Boolean = {
-    if (col >= 8) {
+    if (col >= size-1) {
       solve(row + 1, 0)
     } else {
       solve(row, col + 1)
@@ -79,10 +70,10 @@ object Sudoku {
   def solve(row: Int, col: Int): Boolean = {
     if (puzzleSolved()) {
       return true
-    } else if (puzzle(row)(col) > 0) {
+    } else if (puzzle(row)(col) != 0) {
       return next(row, col)
     } else {
-      for (i <- 1 to 9) {
+      for (i <- 1 to size) {
         if (validate(row, col, i)) {
           puzzle(row)(col) = i;
           if (next(row, col)) {
