@@ -2,7 +2,7 @@ import scala.io.Source
 import scala.collection.mutable.ListBuffer
 
 object Sudoku {
-  var size = 6
+  var size = 7
   val board: Array[Array[Int]] = Array.ofDim[Int](size, size)
   val gaps: Array[Array[Int]] = Array.ofDim[Int](size, size)
 
@@ -10,18 +10,19 @@ object Sudoku {
     val board_source = readFile("input/board_"+size)
     val gaps_source = readFile("input/gaps_"+size)
     parseBoard(board_source)
-    solve(0, 0)
-    display_board()
     parseGaps(gaps_source)
     display_gaps()
-    val ord = verifySequence()
-    println(ord)
+    solve(0, 0)
   }
 
   def display_board(): Unit = {
     for (i <- 0 until size) {
       for (j <- 0 until size) {
-        print(board(i)(j) + " ")
+        if (board(i)(j) == -1){
+            print("  ")
+        } else {
+            print(board(i)(j) + " ")
+        }
       }
       println()
     }
@@ -76,7 +77,12 @@ object Sudoku {
         return false
       }
     }
-    true
+    //println(row, col)
+    if (row == 5 && col == 4 && verifySequence() == false){
+        false
+    } else {
+        true
+    }
   }
 
   def boardSolved(): Boolean = {
@@ -99,54 +105,53 @@ object Sudoku {
   }
 
   def isConsecutive(tempList: Array[Int]): Boolean = {
-    for (i <- 0 until (size - 1)) {// pra não comparar o ultimo elemento
-      if (tempList(i) != tempList(i+1)) {
-        return false  // 
+    for (i <- 0 until (tempList.size - 1)) {// pra não comparar o ultimo elemento
+      if (tempList(i+1) != tempList(i)+1) {
+          //print(tempList(i) , tempList(i+1))
+        return false
       }
     }
     return true
 }
 
-/*
-def isConsecutive(seq: Array[Int]): (Boolean, Int) = {
-  val count = seq.sliding(2).count(a => a(0)+1 == a(1)) 
-  (count > 0, count)
-}
-*/
-  def verifySequence(): Unit = {
+  def verifySequence(): Boolean = {
     for (i <- 0 until size) {
       var temp = new ListBuffer[String]()
       for (j <- 0 until size) {
-        if (gaps(j)(i) == 1) {
-            temp += (board(j)(i)).toString
+        if (gaps(i)(j) == 1) {
+            //println("--------------------------BKPT")
+            //println(board(i)(j))
+            temp += (board(i)(j)).toString
             if (j == size-1) {
                 val tempList = (temp.toList).sorted
-                println(tempList)
+                //println(tempList)
                 val seque = isConsecutive(tempList.map(_.toString.toInt).toArray)
-                if (seque == false){
-                    println("opa")
-                    //return false
+                if (seque == false) {
+                    //println("opa")
+                    return false
                 }
                 temp = new ListBuffer[String]()
             }
         } else {
             val tempList = (temp.toList).sorted
             if(tempList.size > 0){
-                println(tempList)
+                //println(tempList)
                 val seque = isConsecutive(tempList.map(_.toString.toInt).toArray)
                 if (seque == false){
-                    println("opa")
-                    //return false
+                    //println("opa")
+                    return false
                 }
             }
             temp = new ListBuffer[String]()
         }
       }
     }
+    return true
   }
 
   def solve(row: Int, col: Int): Boolean = {
     if (boardSolved()) {
+        display_board()
       return true
     } else if (board(row)(col) != 0) {
       return next(row, col)
