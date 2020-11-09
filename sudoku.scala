@@ -2,7 +2,8 @@ import scala.io.Source
 import scala.collection.mutable.ListBuffer
 
 object Sudoku {
-  var size = 7
+  //6 = 253
+  var size = 6
   val board: Array[Array[Int]] = Array.ofDim[Int](size, size)
   val gaps: Array[Array[Int]] = Array.ofDim[Int](size, size)
 
@@ -77,15 +78,11 @@ object Sudoku {
         return false
       }
     }
-    //println(row, col)
-    if (row == 5 && col == 4 && verifySequence() == false){
-        false
-    } else {
-        true
-    }
+    true
   }
 
   def boardSolved(): Boolean = {
+    //println("bS")
     for (i <- 0 until size) {
       for (j <- 0 until size) {
         if (board(i)(j) == 0) {
@@ -97,7 +94,7 @@ object Sudoku {
   }
 
   def next(row: Int, col: Int): Boolean = {
-    if (col >= size-1) {
+    if (col >= (size-1)) {
       solve(row + 1, 0)
     } else {
       solve(row, col + 1)
@@ -114,15 +111,15 @@ object Sudoku {
     return true
 }
 
-  def verifySequence(): Boolean = {
-    for (i <- 0 until size) {
-      var temp = new ListBuffer[String]()
-      for (j <- 0 until size) {
-        if (gaps(i)(j) == 1) {
-            //println("--------------------------BKPT")
-            //println(board(i)(j))
+  def verifySequenceCol(): Boolean = {
+    //println("verify")
+    var temp = new ListBuffer[String]()
+    for (j <- 0 until (size)) {   // 
+      for (i <- 0 until (size)) { // 
+        //println(i,j)
+        if (gaps(i)(j) == 1) { // aqui o I e o J podem ser igual a SIZE, o que pode dar erro
             temp += (board(i)(j)).toString
-            if (j == size-1) {
+            if (j == size) {
                 val tempList = (temp.toList).sorted
                 //println(tempList)
                 val seque = isConsecutive(tempList.map(_.toString.toInt).toArray)
@@ -149,10 +146,19 @@ object Sudoku {
     return true
   }
 
+
   def solve(row: Int, col: Int): Boolean = {
-    if (boardSolved()) {
+    //println(row,col)
+    if (row == size-1 && col == size-1 && boardSolved()) {
+      if(verifySequenceCol()){
+        println("true")
         display_board()
-      return true
+        display_gaps()
+        return true
+      } else {
+        //display_board()
+        println("false")
+      }
     } else if (board(row)(col) != 0) {
       return next(row, col)
     } else {
