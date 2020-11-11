@@ -10,6 +10,7 @@ object Straights {
   val board: Array[Array[Int]] = Array.ofDim[Int](size, size)
   val gaps: Array[Array[Int]] = Array.ofDim[Int](size, size)
 
+
   def main(args: Array[String]): Unit = {
     val board_source = readFile("input/board_"+size)
     val gaps_source = readFile("input/gaps_"+size)
@@ -82,6 +83,7 @@ object Straights {
     true
   }
 
+  // Encontra próximo valor nulo começando no índice p do tabuleiro s
   def next(row: Int, col: Int): Boolean = {
     if (col >= (size-1) && (row >= (size-1))) {
       solve(row, col)
